@@ -269,7 +269,7 @@ void lcd_str_E(char *str) {
 //
 //----------------------------------------------------------------------------------------
 void lcd_int(int val) {
-    char bufor[17];
+    char bufor[7];
     lcd_str(itoa(val, bufor, 10));
 }
 
