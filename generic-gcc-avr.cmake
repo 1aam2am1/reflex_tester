@@ -184,17 +184,17 @@ endif (AVR_UPLOADTOOL MATCHES avrdude)
 ##########################################################################
 set(CMAKE_CXX_FLAGS "-fno-exceptions" CACHE STRING "Default C++ flags for all builds" FORCE)
 
-set(CMAKE_C_FLAGS_RELEASE "-O3 -Wall" CACHE STRING "Default C flags for release" FORCE)
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall" CACHE STRING "Default C++ flags for release" FORCE)
+set(CMAKE_C_FLAGS_RELEASE "-O3" CACHE STRING "Default C flags for release" FORCE)
+set(CMAKE_CXX_FLAGS_RELEASE "-O3" CACHE STRING "Default C++ flags for release" FORCE)
 
-set(CMAKE_C_FLAGS_MINSIZEREL "-Os -mcall-prologues -Wall" CACHE STRING "Default C flags for minimum size release" FORCE)
-set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -mcall-prologues -Wall" CACHE STRING "Default C++ flags for minimum size release" FORCE)
+set(CMAKE_C_FLAGS_MINSIZEREL "-Os -mcall-prologues" CACHE STRING "Default C flags for minimum size release" FORCE)
+set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -mcall-prologues" CACHE STRING "Default C++ flags for minimum size release" FORCE)
 
-set(CMAKE_C_FLAGS_DEBUG "-g -Wall" CACHE STRING "Default C flags for debug" FORCE)
-set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall" CACHE STRING "Default C++ flags for debug" FORCE)
+set(CMAKE_C_FLAGS_DEBUG "-g" CACHE STRING "Default C flags for debug" FORCE)
+set(CMAKE_CXX_FLAGS_DEBUG "-g" CACHE STRING "Default C++ flags for debug" FORCE)
 
-set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O3 -g -Wall" CACHE STRING "Default C flags for release with debug info" FORCE)
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g -Wall" CACHE STRING "Default C++ flags for release with debug info" FORCE)
+set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O3 -g" CACHE STRING "Default C flags for release with debug info" FORCE)
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g" CACHE STRING "Default C++ flags for release with debug info" FORCE)
 
 
 ##########################################################################
@@ -270,6 +270,8 @@ function(add_avr_executable EXECUTABLE_NAME)
 
     target_compile_options(
             ${elf_file} PUBLIC
+            -Wall
+            -Wno-unknown-pragmas
             -ffunction-sections
             -fdata-sections
             -fpack-struct
