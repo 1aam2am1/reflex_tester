@@ -33,10 +33,14 @@ void LED_Init() {
     CLR_DATA;
     CLR_DISPLAY;
     CLR_SCK;
+
+    LED_down();
 }
 
 //OUT=IN=[8]
 //DATA->OUT[1-5]->IN[1-5]->NULL
+//x => out voltage height if up
+//y => in voltage low if up
 
 void LED_up(uint8_t x, uint8_t y) {
     uint16_t to_shift;

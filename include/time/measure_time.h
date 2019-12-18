@@ -7,11 +7,15 @@
 
 #include <stdint.h>
 
+extern volatile uint8_t button_timer;
+
 void TIMER_Init();
 
 void TIMER_start();
 
 void TIMER_stop();
+
+uint8_t TIMER_working();
 
 uint16_t TIMER_get();
 

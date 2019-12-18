@@ -171,6 +171,10 @@ void lcd_char(char c);                                // domyœlnie wy³¹czona z k
 void lcd_str_P(const char *str);                    // domyœlnie wy³¹czona z kompilacji w pliku lcd.c
 void lcd_str_E(char *str);                            // domyœlnie wy³¹czona z kompilacji w pliku lcd.c
 void lcd_int(int val);                                // domyœlnie wy³¹czona z kompilacji w pliku lcd.c
+void lcd_ulint(uint32_t val);
+
+void lcd_time(uint32_t val);
+
 void lcd_hex(int val);                                // domyœlnie wy³¹czona z kompilacji w pliku lcd.c
 void lcd_defchar(uint8_t nr, uint8_t *def_znak);    // domyœlnie wy³¹czona z kompilacji w pliku lcd.c
 void lcd_defchar_P(uint8_t nr, uint8_t *def_znak);    // domyœlnie wy³¹czona z kompilacji w pliku lcd.c

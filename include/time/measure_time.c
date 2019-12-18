@@ -12,7 +12,10 @@
 #define TIMER_CMP 125
 #endif
 
+volatile uint8_t start_measure;
 volatile uint16_t time_ms;
+
+volatile uint8_t button_timer;
 
 void TIMER_Init() {
     TCCR0 |= (1 << WGM01); //CTC MODE compare
@@ -21,16 +24,23 @@ void TIMER_Init() {
     TCNT0 = 0; //reset counter
 
     OCR0 = TIMER_CMP; //1ms TIMER_CMP
+
+    TCCR0 |= (1 << CS01) | (1 << CS00); //64 prescaler //start timers
 }
 
 void TIMER_start() {
     TCNT0 = 0; //reset counter
+    start_measure = 1;
     time_ms = 0;
-    TCCR0 |= (1 << CS01) | (1 << CS00); //64 prescaler
 }
 
 void TIMER_stop() {
-    TCCR0 &= ~((1 << CS02) | (1 << CS01) | (1 << CS00)); //64 prescaler
+    start_measure = 0;
+    //TCCR0 &= ~((1 << CS02) | (1 << CS01) | (1 << CS00)); //64 prescaler //stop timer
+}
+
+uint8_t TIMER_working() {
+    return start_measure;
 }
 
 uint16_t TIMER_get() {
@@ -39,5 +49,7 @@ uint16_t TIMER_get() {
 
 //compare match 1ms
 ISR(TIMER0_COMP_vect) {
-    ++time_ms;
+    if (start_measure) { ++time_ms; }
+
+    if (button_timer) { --button_timer; }
 }

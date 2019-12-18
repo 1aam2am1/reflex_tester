@@ -18,6 +18,7 @@
 #include <avr/pgmspace.h>
 #include <stdlib.h>
 #include <util/delay.h>
+#include <string.h>
 
 #include "lcd44780.h"
 
@@ -271,6 +272,30 @@ void lcd_str_E(char *str) {
 void lcd_int(int val) {
     char bufor[7];
     lcd_str(itoa(val, bufor, 10));
+}
+
+void lcd_ulint(uint32_t val) {
+    char bufor[11];
+    lcd_str(ultoa(val, bufor, 10));
+}
+
+void lcd_time(uint32_t val) {
+    char bufor[12];
+    uint8_t l;
+    ultoa(val % 1000, bufor, 10);
+    l = strlen(bufor);
+
+    ultoa(val / 1000, bufor, 10);
+    char *wsk = bufor;
+    while (*(++wsk));
+    *wsk++ = '.';
+    l = 3 - l;
+    while (l--) {
+        *wsk++ = '0';
+    }
+    ultoa(val % 1000, wsk, 10);
+
+    lcd_str(bufor);
 }
 
 #endif
