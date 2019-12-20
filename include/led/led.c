@@ -45,9 +45,9 @@ void LED_Init() {
 void LED_up(uint8_t x, uint8_t y) {
     uint16_t to_shift;
 
-    to_shift = (1 << (x + 1));
+    to_shift = (1 << (y + 1));
 
-    to_shift |= (~(1 << (y + 1)) << 8);
+    to_shift |= (~(1 << (x + 1)) << 8);
 
     CLR_DISPLAY;
 

@@ -24,20 +24,27 @@ Work_t *led_work();
 
 void led_end();
 
+
 void work_start();
 
 Work_t *work_work();
+
 
 void eeprom_start();
 
 Work_t *eeprom_work();
 
+
 void run_start();
 
 Work_t *run_work();
 
+
 void menu_start();
 
 Work_t *menu_work();
+
+
+Work_t *button_check_work();
 
 #endif //REFLEX_TESTER_MENU_H

@@ -17,6 +17,7 @@ static Work_t menu = {menu_start, menu_work, NULL};
 static Work_t eeprom = {eeprom_start, eeprom_work, NULL};
 static Work_t work_mode = {work_start, work_work, NULL};
 static Work_t run = {run_start, run_work, NULL};
+static Work_t button_cheack = {NULL, button_check_work, NULL};
 
 static const Button_t u = {2, 1};
 static const Button_t s = {2, 2};
@@ -29,6 +30,7 @@ static int8_t menu_variable;
 static int8_t menu_variable_2;
 
 Work_t *menu_init() {
+    //return &button_cheack;
     return &led;
 }
 
@@ -38,18 +40,34 @@ void led_start() {
     lcd_str("Led check");
     LED_up(0, 0);
     TIMER_start();
+    menu_variable = 0;
+    menu_variable_2 = 0;
 }
 
 Work_t *led_work() {
     Button_t b;
     if (KEY_down_event(&b)) {
         if (b.x == 0 && b.y == 0) {
+            lcd_locate(1, 0);
             lcd_str("OK");
+        } else {
+            lcd_locate(1, 0);
+            lcd_str("ERROR (");
+            lcd_int(b.x);
+            lcd_str(", ");
+            lcd_int(b.y);
+            lcd_str(")");
         }
     } else if (KEY_up_event(&b)) {
-        if (b.x == 0 && b.y == 0) {
-            return &menu;
+        TIMER_start();
+        ++menu_variable;
+        if (menu_variable > 4) {
+            ++menu_variable_2;
+            menu_variable = 0;
         }
+        if (menu_variable_2 > 4) { return &menu; }
+
+        LED_up(menu_variable, menu_variable_2);
     }
     if (TIMER_get() >= 10000) {
         return &menu;
@@ -146,13 +164,13 @@ static inline void display_record() {
 static inline void display_record_one() {
     lcd_cls();
     lcd_str("Button: (");
-    lcd_int(work_record.test[menu_variable_2].b.x);
+    lcd_int(work_record.test[menu_variable_2 - 1].b.x);
     lcd_str(", ");
-    lcd_int(work_record.test[menu_variable_2].b.y);
+    lcd_int(work_record.test[menu_variable_2 - 1].b.y);
     lcd_str(")");
     lcd_locate(1, 0);
     lcd_str("Time: ");
-    lcd_time(work_record.test[menu_variable_2].time);
+    lcd_time(work_record.test[menu_variable_2 - 1].time);
     lcd_str("s");
 }
 
@@ -185,7 +203,7 @@ Work_t *eeprom_work() {
             lcd_locate(1, 0);
             lcd_str("Ok");
         } else {
-            if (menu_variable_2 < (work_record.mode - 1)) {
+            if (work_record.mode && (menu_variable_2 < work_record.mode)) {
                 ++menu_variable_2;
             }
             display_record_one();
@@ -230,7 +248,7 @@ Work_t *eeprom_work() {
 /////////////////////////////run////////////////////////////////////
 void run_start() {
     lcd_cls();
-    lcd_str("Time to start: ");
+    lcd_str("Time to start:");
     TIMER_start();
 
     lcd_int(10 - (TIMER_get() / 1000));
@@ -240,28 +258,51 @@ void run_start() {
 }
 
 Work_t *run_work() {
+    lcd_locate(1, 0);
+    lcd_int(menu_variable);
+    lcd_str(" ");
+    lcd_int(menu_variable_2);
+
     if (menu_variable == 0) {
         if (TIMER_get() > 10000) {
             menu_variable = 1;
             TIMER_stop();
+
+            lcd_cls();
+            lcd_str("RUN");
+
             uint8_t x = my_random() % 5;
             uint8_t y = my_random() % 5;
 
             work_record.test[menu_variable_2].b.x = x;
-            work_record.test[menu_variable_2].b.x = y;
+            work_record.test[menu_variable_2].b.y = y;
             LED_up(x, y);
             TIMER_start();
         } else {
-            lcd_cls();
-            lcd_str("Time to start: ");
+            lcd_locate(0, 0);
+            lcd_str("Time to start:");
             lcd_int(10 - (TIMER_get() / 1000));
+            lcd_str(" ");
         }
     } else if (menu_variable != 0) {
+        lcd_locate(1, 4);
+        lcd_str("i");
+
         if (TIMER_get() > 32767) { menu_variable = 2; }
         Button_t b;
         if (KEY_down_event(&b)) {
+            lcd_str("d");
+            lcd_int(work_record.test[menu_variable_2].b.x);
+            lcd_str(" ");
+            lcd_int(work_record.test[menu_variable_2].b.y);
+            lcd_str(" ");
+            lcd_int(b.x);
+            lcd_str(" ");
+            lcd_int(b.y);
+
             if (b.x == work_record.test[menu_variable_2].b.x &&
                 b.y == work_record.test[menu_variable_2].b.y) {
+                lcd_str("f");
                 TIMER_stop();
                 LED_down();
 
@@ -273,14 +314,17 @@ Work_t *run_work() {
             if (b.x == work_record.test[menu_variable_2].b.x &&
                 b.y == work_record.test[menu_variable_2].b.y) {
                 ++menu_variable_2;
-                if (menu_variable_2 >= work_record.mode) { return &menu; }
+                if (menu_variable_2 >= work_record.mode) {
+                    LOG_save(&work_record);
+                    return &menu;
+                }
 
                 menu_variable = 1;
                 uint8_t x = my_random() % 5;
                 uint8_t y = my_random() % 5;
 
                 work_record.test[menu_variable_2].b.x = x;
-                work_record.test[menu_variable_2].b.x = y;
+                work_record.test[menu_variable_2].b.y = y;
                 LED_up(x, y);
                 TIMER_start();
             }
@@ -288,6 +332,32 @@ Work_t *run_work() {
     }
     if (menu_variable == 2) {
         if (TIMER_get() < 32767) { menu_variable = 3; }
+    }
+
+    return NULL;
+}
+
+
+/////////////////////////////button check work//////////////////////
+Work_t *button_check_work() {
+    Button_t b;
+    if (KEY_down_event(&b)) {
+        lcd_locate(0, 0);
+        lcd_str("D: (");
+        lcd_int(b.x);
+        lcd_str(", ");
+        lcd_int(b.y);
+        lcd_str(")");
+        lcd_str("         ");
+    }
+    if (KEY_up_event(&b)) {
+        lcd_locate(1, 0);
+        lcd_str("U: (");
+        lcd_int(b.x);
+        lcd_str(", ");
+        lcd_int(b.y);
+        lcd_str(")");
+        lcd_str("         ");
     }
 
     return NULL;

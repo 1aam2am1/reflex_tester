@@ -27,13 +27,13 @@ int main() {
     UART_Init();
     register_uart_str_rx_event_callback(_uart_str_rx_event_callback);
 
-    KEY_Init();
     LOG_Init();
 
     sei();
 
     TIMER_start();
     _delay_ms(500);
+    KEY_Init(); ///jtag off
 
     my_srandom(TIMER_get(), 5380);
     TIMER_stop();
@@ -41,6 +41,9 @@ int main() {
     work.initialize = NULL;
     work.work = menu_init;
     work.destruct = NULL;
+
+    TIMER_start();
+    uint16_t p = 0;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
     while (1) {
@@ -54,6 +57,11 @@ int main() {
             work = *new;
             if (work.initialize) { work.initialize(); }
         }
+/*
+        lcd_locate(1, 5);
+        lcd_time(TIMER_get() - p);
+        p = TIMER_get();
+        lcd_str("       ");*/
     }
 #pragma clang diagnostic pop
 

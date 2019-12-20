@@ -102,6 +102,11 @@ void uart_putint(int value, int radix)    // wysyła na port szeregowy tekst
     uart_puts(string);            // wyślij string na port szeregowy
 }
 
+void uart_putulint(uint32_t val) {
+    char bufor[11];
+    uart_puts(ultoa(val, bufor, 10));
+}
+
 
 int16_t uart_getc() {
     // sprawdzamy czy indeksy są równe

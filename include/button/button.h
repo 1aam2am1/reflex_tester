@@ -11,7 +11,7 @@
 
 #define KEY_OUTPORT B
 
-#define KEY_DELEAY 150;
+#define KEY_DELEAY 20;
 
 #define PORT(x) SPORT(x)
 #define SPORT(x) (PORT##x)

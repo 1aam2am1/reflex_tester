@@ -28,6 +28,8 @@ void uart_puts_P(const char *s);
 
 void uart_putint(int16_t value, int16_t radix);
 
+void uart_putulint(uint32_t value);
+
 char *uart_get_str(char *buf);
 
 void UART_RX_STR_EVENT(char *rbuf);
